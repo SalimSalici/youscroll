@@ -2,7 +2,7 @@
   "name": "youscroll",
   "version": "0.0.0",
   "description": "A simple and lightweight javascript library to smoothly scroll a page to a desired location.",
-  "main": "youscroll.js",
+  "main": "src/youscroll.js",
   "scripts": {
     "build-min": "uglifyjs src/youscroll.js -o dist/youscroll.min.js --compress --mangle --comments",
     "build": "npm run build-min",
