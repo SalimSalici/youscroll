@@ -66,7 +66,7 @@
     youScroll.end = function () {
 
         clearInterval(interval);
-        window.scrollTo(0, startY + deltaY);
+        root.scrollTo(0, startY + deltaY);
         isYouScrolling = false;
 
         scrollEndCallback();
@@ -155,7 +155,7 @@
     function scrollStep() {
 
         var newY = easing(currentTime, startY, deltaY, duration);
-        window.scrollTo(0, newY);
+        root.scrollTo(0, newY);
         currentTime += configs.intervalTime;
 
         if (currentTime >= duration)
