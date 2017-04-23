@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>YouSrolls.js Demo</title>
+
+    <script src="dist/youscroll.min.js"></script>
+
+    <style>
+        
+        html, body {
+            margin: 0;
+            padding: 0;
+            font-family: Roboto, Helvetica, sans-serif, arial;
+        }
+
+        .panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 400px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 2px 10px 1px #000;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panelTitle {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.3);
+            top: 0;
+            padding: 10px 20px;
+            width: 60%;
+            box-shadow: 0 0 4px 0px #000;
+            font-size: 30px;
+        }
+
+        .panelText {
+            margin-top: 50px;
+            font-size: 24px;
+        }
+
+        .panelCode {
+            color: #000;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, 0.7);
+            padding: 10px 20px;
+            font-size: 16px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            text-align: left; 
+        }
+
+        #first {
+            background: #2c3e50;
+        }
+
+        #second {
+            background: #16a085;
+        }
+
+        #third {
+            background: #c0392b;
+        }
+
+        #fourth {
+            background: #f39c12;
+            cursor: auto;
+        }
+
+        #fifth {
+            background: #2980b9;
+        }
+
+        #by {
+            background: #8e44ad;
+        }
+
+    </style>
+
+</head>
+<body>
+
+    <h1 style="padding-left: 30px">
+        <span style="font-weight: lighter">YouScroll.js</span> Demo
+    </h1>
+    
+    <div id="first" class="panel" onclick="youScroll.to('#second').start()">
+        <div class="panelTitle">#first</div>
+        <div>
+            <div class="panelText">Scroll to #second</div>
+            <div class="panelCode">
+
+                <code>
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to('#second').start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span>
+                </code>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="second" class="panel" onclick="youScroll.to('#third').start()">
+        <div class="panelTitle">#second</div>
+        <div>
+            <div class="panelText">Scroll to #third</div>
+            <div class="panelCode">
+
+                <code>
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to('#second').start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span>
+                </code>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="by" class="panel" onclick="youScroll.by(100).start()">
+        <div class="panelTitle">#by</div>
+        <div>
+            <div class="panelText">Scroll down by 100px</div>
+            <div class="panelCode">
+                
+                <code>
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.by(100).start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span>
+                </code>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="third" class="panel" onclick="youScroll.to('#fifth').start()">
+        <div class="panelTitle">#third</div>
+        <div>
+            <div class="panelText">Scroll to #fifth</div>
+            <div class="panelCode">
+                
+                <code>
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to("#fifth").start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span>
+                </code>
+                
+            </div>
+        </div>
+    </div>
+
+    <div id="fourth" class="panel" onclick="youScroll.to('#fifth').start()">
+        <div class="panelTitle">#fourth</div>
+        <div>
+            <div class="panelText">Nothing here... Just making up space.</div>
+        </div>
+    </div>
+
+    <div id="fifth" class="panel" onclick="youScroll.to('#first').setCallback(backToTopCallback).start()">
+        <div class="panelTitle">#fifth</div>
+        <div>
+            <div class="panelText">Scroll to #first and invoke <b>callback</b> at end of scroll</div>
+            <div class="panelCode">
+                
+                <code>
+
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to('#first').setCallback(backToTopCallback).start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span><br /><br />
+
+                    &lt;<span style='color:#7f0055; font-weight:bold;'>script</span>&gt;<br /><br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;<span style='color:#000000;'><span style='color:#7f0055; font-weight:bold; '>function</span> backToTopCallback() {<br />
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style='color:#7f0055; font-weight:bold; '>alert</span>(<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>Back to top</span><span style='color:#2a00ff; '>"</span>);<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp;}
+                    </span><br /><br />
+                    &lt;/<span style='color:#7f0055; font-weight:bold;'>script</span>&gt;<br />
+
+                </code>
+                
+            </div>
+        </div>
+    </div>
+
+    <script>
+        
+    function backToTopCallback() {
+        alert("Back to top.");
+    }
+
+    </script>
+
+</body>
+</html>

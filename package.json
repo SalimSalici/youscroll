@@ -1,0 +1,29 @@
+{
+  "name": "youscroll",
+  "version": "0.0.0",
+  "description": "A simple and lightweight javascript library to smoothly scroll a page to a desired location.",
+  "main": "youscroll.js",
+  "scripts": {
+    "build-min": "uglifyjs src/youscroll.js -o dist/youscroll.min.js --compress --mangle --comments",
+    "build": "npm run build-min",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SalimSalici/youscroll.git"
+  },
+  "keywords": [
+    "javascript",
+    "smooth",
+    "scroll"
+  ],
+  "author": "Salim Salici",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/SalimSalici/youscroll/issues"
+  },
+  "homepage": "https://github.com/SalimSalici/youscroll#readme",
+  "devDependencies": {
+    "uglify-js": "^2.8.22"
+  }
+}
