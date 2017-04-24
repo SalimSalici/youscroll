@@ -52,6 +52,8 @@
         if (duration === undefined)
             duration = configs.duration;
 
+        containScroll();
+
         clearInterval(interval);
         interval = setInterval(scrollStep, configs.intervalTime);
 
@@ -213,6 +215,25 @@
      */
     function elementYOffset(element) {
         return Math.round(element.getBoundingClientRect().top);
+    }
+
+    /**
+     * Contains the scroll withing the container limits.
+     * @private
+     */
+    function containScroll() {
+
+        var targetY = startY + deltaY;
+
+        if (targetY < 0)
+            deltaY += -targetY;
+        else {
+            var containerVisibleHeight = focus ? focus.offsetHeight : root.innerHeight;
+            var containerRealHeight = focus ? focus.scrollHeight : document.body.offsetHeight;
+            if (targetY + containerVisibleHeight > containerRealHeight)
+                deltaY -= targetY + containerVisibleHeight - containerRealHeight;
+        }
+
     }
 
     // Easing functions
