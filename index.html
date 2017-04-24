@@ -14,6 +14,19 @@
             font-family: Roboto, Helvetica, sans-serif, arial;
         }
 
+        .btn {
+            padding: 10px;
+            background: #272822;
+            color: #eee;
+            border: 1px solid #111;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .btn:hover {
+            background: #35362f;
+        }
+
         .panel {
             display: flex;
             align-items: center;
@@ -53,6 +66,15 @@
             text-align: left; 
         }
 
+        .panelBox {
+            padding: 10px;
+            width: 400px;
+            height: 200px;
+            background: #272822;
+            box-shadow: 0 0 6px 0px rgba(0, 0, 0, 0.4);
+            overflow: auto;
+        }
+
         #first {
             background: #2c3e50;
         }
@@ -76,6 +98,42 @@
 
         #by {
             background: #8e44ad;
+        }
+
+        #dev {
+            background: #A6C628;
+            cursor: auto;
+        }
+
+        #testParent {
+            will-change: transform;
+        }
+
+        .nested {
+            width: 90%;
+            margin: 10px auto;
+            height: 100px;
+            line-height: 100px;
+            background: #911;
+            font-size: 24px;
+            border: 1px solid #111;
+        }
+
+        .scroll-arrow {
+            display: block;
+        }
+
+        #page-scroll-btn-container {
+            position: fixed;
+            width: 70px;
+            z-index: 10;
+            bottom: 20px;
+            right: 20px;
+        }
+
+        #page-scroll-btn-container .scroll-arrow {
+            position: relative;
+            height: 50px;
         }
 
     </style>
@@ -150,7 +208,13 @@
     <div id="fourth" class="panel">
         <div class="panelTitle">#fourth</div>
         <div>
-            <div class="panelText">Nothing here... Just making up space.</div>
+            <div class="panelText">Nothing here... Just making up space.</div><br>
+            <div class="btn" onclick="nestedScroll()">
+                Nested
+            </div>
+            <div class="btn" onclick="youScroll.by(-3000).start()">
+                -3000px
+            </div>
         </div>
     </div>
 
@@ -178,11 +242,42 @@
         </div>
     </div>
 
+    <div id="dev" class="panel">
+        <div class="panelTitle">#deep</div>
+        <div class="btn" onclick="youScroll.focus('#testParent').to('#nestedElement2').start()">Go to Yo</div>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div id="testParent" class="panelBox">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit accusantium sequi voluptate maiores distinctio consequatur, dicta itaque nemo, dignissimos nisi, nesciunt laborum. Commodi blanditiis accusantium, corporis labore quas impedit dolores.
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit accusantium sequi voluptate maiores distinctio consequatur, dicta itaque nemo, dignissimos nisi, nesciunt laborum. Commodi blanditiis accusantium, corporis labore quas impedit dolores.
+            <div id="nestedElement" class="nested">Hey There</div>
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit accusantium sequi voluptate maiores distinctio consequatur, dicta itaque nemo, dignissimos nisi, nesciunt laborum. Commodi blanditiis accusantium, corporis labore quas impedit dolores.
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit. Fugit accusantium sequi voluptate maiores distinctio consequatur, dicta itaque nemo, dignissimos nisi, nesciunt laborum. Commodi blanditiis accusantium, corporis labore quas impedit dolores.
+            <div id="nestedElement2" class="nested">Yo</div>
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div>
+            <div class="btn scroll-arrow" onclick="youScroll.focus('#testParent').by(-200).start()">Up</div>
+            <div class="btn scroll-arrow" onclick="youScroll.focus('#testParent').by(200).start()">Down</div>
+        </div>
+    </div>
+
+    <div id="page-scroll-btn-container">
+        <div class="btn scroll-arrow" onclick="youScroll.by(-400).start()">Up</div>
+        <div class="btn scroll-arrow" onclick="youScroll.by(400).start()">Down</div>
+    </div>
+
     <script>
         
     function backToTopCallback() {
         alert("Back to top.");
     }
+
+    function nestedScroll() {
+        youScroll.to('#testParent', -70).setCallback(function () {
+            youScroll.focus('#testParent').to('#nestedElement', -20).start();
+        }).start();
+    }
+
+    var testParent = document.getElementById("testParent");
+    var nestedElement = document.getElementById("nestedElement");
 
     </script>
 

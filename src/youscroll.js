@@ -9,9 +9,9 @@
  */
 
 (function (root, factory) {
-    if ( typeof define === "function" && define.amd ) {
+    if (typeof define === "function" && define.amd) {
         define([], factory(root));
-    } else if ( typeof exports === "object" ) {
+    } else if (typeof exports === "object") {
         module.exports = factory(root);
     } else {
         root.youScroll = factory(root);
@@ -22,11 +22,11 @@
 
     var youScroll = {}; // Public API
     var interval, startY, deltaY, currentTime, isYouScrolling;
-    var duration, easing, scrollEndCallback;
+    var duration, easing, scrollEndCallback, focus;
 
     // Default settings
     var configs = {
-        duration: 1000,
+        duration: 1200,
         easing: "easeInOutQuad",
         force: false,
         intervalTime: 5,
@@ -66,11 +66,38 @@
     youScroll.end = function () {
 
         clearInterval(interval);
-        root.scrollTo(0, startY + deltaY);
-        isYouScrolling = false;
 
-        scrollEndCallback();
+        if (focus)
+            focus.scrollTop = startY + deltaY;
+        else
+            root.scrollTo(0, startY + deltaY);
+
+        isYouScrolling = false;
+        focus = undefined;
+
+        // Assigning scrollEndCallback to cb so that if the callback starts another
+        // youScroll scroll, the callback for that won't be set to undefined
+        var cb = scrollEndCallback;
         scrollEndCallback = undefined;
+
+        cb();
+
+    }
+
+    /**
+     * Set the container element to scroll.
+     * @public
+     * @param {String} selector - The selector for the element
+     * @return {Object} The youScroll object
+     */
+    youScroll.focus = function (selector) {
+
+        // If in a middle of a scroll (and with force enabled) ignore
+        if (isYouScrolling && configs.force) return youScroll;
+
+        focus = document.querySelector(selector);
+
+        return youScroll;
 
     }
 
@@ -78,17 +105,20 @@
      * Set the target element where to scroll.
      * @public
      * @param {String} selector - The selector for the element
+     * @param {Number} offset - The selector for the element
      * @return {Object} The youScroll object
      */
-    youScroll.to = function (selector) {
+    youScroll.to = function (selector, offset) {
 
         // If in a middle of a scroll (and with force enabled) ignore
         if (isYouScrolling && configs.force) return youScroll;
 
-        var element = document.querySelector(selector);
+        var target = document.querySelector(selector);
 
-        startY = root.pageYOffset;
-        deltaY = Math.round(elementYOffset(element));
+        startY = focus ? focus.scrollTop                                : root.pageYOffset;
+        deltaY = focus ? elementYOffset(target) - elementYOffset(focus) : elementYOffset(target);
+
+        deltaY += offset || 0;
 
         return youScroll;
 
@@ -105,7 +135,7 @@
         // If in a middle of a scroll (and with force enabled) ignore
         if (isYouScrolling && configs.force) return youScroll;
 
-        startY = root.pageYOffset;
+        startY = focus ? focus.scrollTop : root.pageYOffset;
         deltaY = amount;
 
         return youScroll;
@@ -155,7 +185,9 @@
     function scrollStep() {
 
         var newY = easing(currentTime, startY, deltaY, duration);
-        root.scrollTo(0, newY);
+
+        focus ? (focus.scrollTop = newY) : root.scrollTo(0, newY);
+
         currentTime += configs.intervalTime;
 
         if (currentTime >= duration)
@@ -180,7 +212,7 @@
      * @return {Number} The element's Y coordinate
      */
     function elementYOffset(element) {
-        return element.getBoundingClientRect().top;
+        return Math.round(element.getBoundingClientRect().top);
     }
 
     // Easing functions
