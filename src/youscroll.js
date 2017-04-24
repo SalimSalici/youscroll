@@ -46,10 +46,10 @@
         currentTime = 0;
         easing = easingFunctions[configs.easing];
 
-        if (scrollEndCallback == undefined)
+        if (scrollEndCallback === undefined)
             scrollEndCallback = configs.defaultCallback;
 
-        if (duration == undefined)
+        if (duration === undefined)
             duration = configs.duration;
 
         clearInterval(interval);
@@ -88,7 +88,7 @@
         var element = document.querySelector(selector);
 
         startY = root.pageYOffset;
-        deltaY = documentOffsetTop(element) - startY;
+        deltaY = Math.round(elementYOffset(element));
 
         return youScroll;
 
@@ -166,11 +166,21 @@
     /**
      * Get the Y coordinate of an element.
      * @private
-     * @param  {Node} element - The element to get the height of
+     * @param  {Node} element
      * @return {Number} The element's Y coordinate
      */
     function documentOffsetTop(element) {
-        return element.offsetTop + ( element.offsetParent ? documentOffsetTop(element.offsetParent) : 0 );
+        return element.offsetTop + (element.offsetParent ? documentOffsetTop(element.offsetParent) : 0);
+    }
+
+    /**
+     * Get the Y offset of an element relative to the window current scroll position.
+     * @private
+     * @param  {Node} element
+     * @return {Number} The element's Y coordinate
+     */
+    function elementYOffset(element) {
+        return element.getBoundingClientRect().top;
     }
 
     // Easing functions
