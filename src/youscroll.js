@@ -21,70 +21,151 @@
     "use strict";
 
     var youScroll = {}; // Public API
-    var interval, startY, deltaY, currentTime, isYouScrolling;
-    var duration, easing, scrollEndCallback, focus;
 
     // Default settings
-    var configs = {
+    var defaultConfigs = {
         duration: 1200,
         easing: "easeInOutQuad",
         force: false,
         intervalTime: 5,
-        defaultCallback: function () {}
+        endCallback: undefined
+    };
+
+    var scrollInstances = [];
+
+    var focus, startY, deltaY;
+    var instanceConfigs = Object.create(defaultConfigs);
+
+    function youScrollInstance(focus, startY, deltaY, configs) {
+
+        var youScrollInstance = {}; // Instance public API
+
+        var interval, currentTime;
+
+        var easing = easingFunctions[configs.easing];
+
+        /**
+         * Initialize the scroll instance.
+         * @private
+         */
+        function init() {
+            currentTime = 0;
+            interval = setInterval(scrollStep, configs.intervalTime);
+            addListeners();
+        }
+
+        /**
+         * Stop the scroll instance.
+         * @public
+         */
+        youScrollInstance.end = function () {
+
+            clearInterval(interval);
+
+            if (typeof configs.endCallback == "function")
+                configs.endCallback();
+
+            scrollInstances.splice(scrollInstances.indexOf(youScrollInstance), 1);
+            removeListeners();
+            
+        };
+
+        // Getters
+
+        youScrollInstance.getFocus = function () {
+            return focus;
+        };
+
+        youScrollInstance.getForce = function () {
+            return configs.force;
+        };
+
+        /**
+         * Scroll the page based on easing function.
+         * @private
+         */
+        function scrollStep() {
+
+            var newY = easing(currentTime, startY, deltaY, configs.duration);
+
+            focus ? (focus.scrollTop = newY) : root.scrollTo(0, newY);
+
+            currentTime += configs.intervalTime;
+
+            if (currentTime >= configs.duration) {
+                newY = startY + deltaY;
+                focus ? (focus.scrollTop = newY) : root.scrollTo(0, newY);
+                youScrollInstance.end();
+            }
+
+        }
+
+        /**
+         * Add listeners to prevent mouse wheel scrolling if force is true,
+         * or to end youScroll instance if force is false
+         * @private
+         */
+        function addListeners() {
+
+            var target = focus || root;
+
+            target.addEventListener("wheel", wheelEvt);
+            target.addEventListener("mousewheel", wheelEvt);
+
+        }
+
+        /**
+         * Remove listeners.
+         * @private
+         */
+        function removeListeners() {
+
+            var target = focus || root;
+
+            target.removeEventListener("wheel", wheelEvt);
+            target.removeEventListener("mousewheel", wheelEvt);
+
+        }
+
+        /**
+         * Prevent mouse wheel scrolling if force is true,
+         * or to end youScroll instance if force is false
+         * @private
+         */
+        function wheelEvt(evt) {
+            if (configs.force)
+                evt.preventDefault();
+            else
+                youScrollInstance.end();
+        }
+
+        init();
+
+        return youScrollInstance;
+
     }
 
-    // Public methods
-
     /**
-     * Start scrolling.
+     * Start scrolling instance.
      * @public
      */
     youScroll.start = function () {
 
-        if (isYouScrolling && configs.force) return;
+        if (canScroll(focus)) {
 
-        currentTime = 0;
-        easing = easingFunctions[configs.easing];
+            containScroll();
 
-        if (scrollEndCallback === undefined)
-            scrollEndCallback = configs.defaultCallback;
+            var instance = youScrollInstance(focus, startY, deltaY, instanceConfigs);
+            scrollInstances.push(instance);
 
-        if (duration === undefined)
-            duration = configs.duration;
+        }
 
-        containScroll();
-
-        clearInterval(interval);
-        interval = setInterval(scrollStep, configs.intervalTime);
-
-        isYouScrolling = true;
-
-    }
-
-    /**
-     * Stop the current scroll.
-     * @public
-     */
-    youScroll.end = function () {
-
-        clearInterval(interval);
-
-        if (focus)
-            focus.scrollTop = startY + deltaY;
-        else
-            root.scrollTo(0, startY + deltaY);
-
-        isYouScrolling = false;
         focus = undefined;
+        instanceConfigs = Object.create(defaultConfigs);
 
-        // Assigning scrollEndCallback to cb so that if the callback starts another
-        // youScroll scroll, the callback for that won't be set to undefined
-        var cb = scrollEndCallback;
-        scrollEndCallback = undefined;
+        return instance;
 
-        cb();
-
-    }
+    };
 
     /**
      * Set the container element to scroll.
@@ -93,15 +174,9 @@
      * @return {Object} The youScroll object
      */
     youScroll.focus = function (selector) {
-
-        // If in a middle of a scroll (and with force enabled) ignore
-        if (isYouScrolling && configs.force) return youScroll;
-
         focus = document.querySelector(selector);
-
         return youScroll;
-
-    }
+    };
 
     /**
      * Set the target element where to scroll.
@@ -112,9 +187,6 @@
      */
     youScroll.to = function (selector, offset) {
 
-        // If in a middle of a scroll (and with force enabled) ignore
-        if (isYouScrolling && configs.force) return youScroll;
-
         var target = document.querySelector(selector);
 
         startY = focus ? focus.scrollTop                                : root.pageYOffset;
@@ -124,7 +196,7 @@
 
         return youScroll;
 
-    }
+    };
 
     /**
      * Set how much the page will be scrolled.
@@ -133,33 +205,21 @@
      * @return {Object} The youScroll object
      */
     youScroll.by = function (amount) {
-
-        // If in a middle of a scroll (and with force enabled) ignore
-        if (isYouScrolling && configs.force) return youScroll;
-
         startY = focus ? focus.scrollTop : root.pageYOffset;
         deltaY = amount;
-
         return youScroll;
-
-    }
+    };
 
     /**
      * Set the scroll duration.
      * @public
-     * @param {Number} amount - The duration of the scroll
+     * @param {Number} duration - The duration of the scroll
      * @return {Object} The youScroll object
      */
-    youScroll.lasts = function (amount) {
-
-        // If in a middle of a scroll (and with force enabled) ignore
-        if (isYouScrolling && configs.force) return youScroll;
-
-        duration = amount;
-
+    youScroll.lasts = function (duration) {
+        instanceConfigs.duration = duration;
         return youScroll;
-
-    }
+    };
 
     /**
      * Set the callback that will be called when the scroll is over.
@@ -168,33 +228,45 @@
      * @return {Object} The youScroll object
      */
     youScroll.setCallback = function (callback) {
-
-        // If in a middle of a scroll (and with force enabled) ignore
-        if (isYouScrolling && configs.force) return youScroll;
-
-        scrollEndCallback = callback;
-
+        instanceConfigs.endCallback = callback;
         return youScroll;
-
-    }
-
-    // Private helper functions
+    };
 
     /**
-     * Scroll the page based on easing function.
-     * @private
+     * Set the force configuration.
+     * @public
+     * @param {Boolean} force
+     * @return {Object} The youScroll object
      */
-    function scrollStep() {
+    youScroll.force = function (force) {
+        instanceConfigs.force = force;
+        return youScroll;
+    };
 
-        var newY = easing(currentTime, startY, deltaY, duration);
+    /**
+     * Check if it is possible to start a new youScroll instance in an element.
+     * @public
+     * @param {Node} element
+     * @return {Boolean} - If the element is currently subject to another youScroll instance
+     * and its force config is set to true, deny the new youScroll. If the force config is
+     * set to false, stop the current youScroll instance and allow the new scroll.
+     */
+    function canScroll(element) {
 
-        focus ? (focus.scrollTop = newY) : root.scrollTo(0, newY);
+        for (var i = 0; i < scrollInstances.length; i++) {
 
-        currentTime += configs.intervalTime;
+            if (scrollInstances[i].getFocus() == element) {
+                if (scrollInstances[i].getForce() === true)
+                    return false;
+                else {
+                    scrollInstances[i].end();
+                    return true;
+                }
+            }
 
-        if (currentTime >= duration)
-            youScroll.end();
+        }
 
+        return true;
     }
 
     /**
@@ -263,7 +335,7 @@
             return c*(t*t*t + 1) + b;
         }
 
-    }
+    };
 
     return youScroll;
 
