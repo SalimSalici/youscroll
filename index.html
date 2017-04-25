@@ -145,7 +145,7 @@
         <span style="font-weight: lighter">YouScroll.js</span> Demo
     </h1>
     
-    <div id="first" class="panel" onclick="youScroll.to('#second').start()">
+    <div id="first" class="panel" onclick="testPromess()">
         <div class="panelTitle">#first</div>
         <div>
             <div class="panelText">Scroll to #second</div>
@@ -215,6 +215,9 @@
             <div class="btn" onclick="youScroll.by(-3000).start()">
                 -3000px
             </div>
+            <div id="sStop" class="btn">
+                S to Stop
+            </div>
         </div>
     </div>
 
@@ -278,6 +281,30 @@
 
     var testParent = document.getElementById("testParent");
     var nestedElement = document.getElementById("nestedElement");
+
+    function testPromess() {
+        youScroll.to('#second').start().and.then(function () {
+            return youScroll.to('#third').start().and;
+        }).then(function () {
+            return youScroll.to('#fourth').start().and;
+        }).then(function () {
+            youScroll.to('#fifth').start();
+        }).catch(function (msg) {
+            console.error(msg);
+        });
+    }
+
+    var sStopBtn = document.getElementById("sStop");
+
+    sStopBtn.addEventListener("click", function() {
+        var scroll = youScroll.to("#first").start();
+        document.addEventListener("keydown", function tmp(evt) {
+            if (evt.keyCode === 83) {
+                scroll.instance.end();
+                document.removeEventListener("keydown", tmp);
+            }
+        });
+    });
 
     </script>
 
