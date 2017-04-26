@@ -23,14 +23,14 @@
     var defaultConfigs = {
         duration: 1200,
         easing: "easeInOutQuad",
-        force: true,
+        force: false,
         intervalTime: 5,
         endCallback: undefined
     };
     var scrollInstances = [];
-    var focus, startY, deltaY;
+    var focus, startY, deltaY, startX, deltaX;
     var instanceConfigs = Object.create(defaultConfigs);
-    function youScrollInstance(focus, startY, deltaY, configs, resolve, reject) {
+    function youScrollInstance(focus, startX, deltaX, startY, deltaY, configs, resolve, reject) {
         var youScrollInstance = {};
         // Instance public API
         var interval, currentTime;
@@ -67,13 +67,23 @@
          * @private
          */
         function scrollStep() {
+            var newX = easing(currentTime, startX, deltaX, configs.duration);
             var newY = easing(currentTime, startY, deltaY, configs.duration);
-            focus ? focus.scrollTop = newY : root.scrollTo(0, newY);
+            youScrollTo(newX, newY);
             currentTime += configs.intervalTime;
             if (currentTime >= configs.duration) {
+                newX = startX + deltaX;
                 newY = startY + deltaY;
-                focus ? focus.scrollTop = newY : root.scrollTo(0, newY);
+                youScrollTo(newX, newY);
                 youScrollInstance.end();
+            }
+        }
+        function youScrollTo(x, y) {
+            if (focus) {
+                focus.scrollLeft = x;
+                focus.scrollTop = y;
+            } else {
+                root.scrollTo(x, y);
             }
         }
         /**
@@ -97,7 +107,7 @@
         }
         /**
          * Prevent mouse wheel scrolling if force is true,
-         * or to end youScroll instance if force is false
+         * end youScroll instance if force is false
          * @private
          */
         function wheelEvt(evt) {
@@ -120,7 +130,7 @@
         var promess = new Promise(function(resolve, reject) {
             if (canScroll(focus)) {
                 containScroll();
-                instance = youScrollInstance(focus, startY, deltaY, instanceConfigs, resolve, reject);
+                instance = youScrollInstance(focus, startX, deltaX, startY, deltaY, instanceConfigs, resolve, reject);
                 scrollInstances.push(instance);
             } else reject("Cannot start a new scroll if the element is already scrolling.");
         });
@@ -143,26 +153,70 @@
     /**
      * Set the target element where to scroll.
      * @public
-     * @param {String} selector - The selector for the element
-     * @param {Number} offset - The selector for the element
+     * @param {String} selector
+     * @param {Number} offset
      * @return {Object} The youScroll object
      */
-    youScroll.to = function(selector, offset) {
+    youScroll.to = function(selector, offsetX, offsetY) {
+        if (offsetX === true) offsetX = 0; else if (arguments.length <= 2) return youScroll.ver(selector, offsetX);
+        var target = document.querySelector(selector);
+        startY = focus ? focus.scrollTop : root.pageYOffset;
+        deltaY = focus ? elementYOffset(target) - elementYOffset(focus) : elementYOffset(target);
+        deltaY += offsetY || 0;
+        startX = focus ? focus.scrollLeft : root.pageXOffset;
+        deltaX = focus ? elementXOffset(target) - elementXOffset(focus) : elementXOffset(target);
+        deltaX += offsetX || 0;
+        return youScroll;
+    };
+    /**
+     * Set the target element where to scroll horizontally.
+     * @public
+     * @param {String} selector
+     * @param {Number} offset
+     * @return {Object} The youScroll object
+     */
+    youScroll.hor = function(selector, offset) {
+        var target = document.querySelector(selector);
+        startY = focus ? focus.scrollTop : root.pageYOffset;
+        deltaY = 0;
+        startX = focus ? focus.scrollLeft : root.pageXOffset;
+        deltaX = focus ? elementXOffset(target) - elementXOffset(focus) : elementXOffset(target);
+        deltaX += offset || 0;
+        return youScroll;
+    };
+    /**
+     * Set the target element where to scroll vertically.
+     * @public
+     * @param {String} selector
+     * @param {Number} offset
+     * @return {Object} The youScroll object
+     */
+    youScroll.ver = function(selector, offset) {
         var target = document.querySelector(selector);
         startY = focus ? focus.scrollTop : root.pageYOffset;
         deltaY = focus ? elementYOffset(target) - elementYOffset(focus) : elementYOffset(target);
         deltaY += offset || 0;
+        startX = focus ? focus.scrollLeft : root.pageXOffset;
+        deltaX = 0;
         return youScroll;
     };
     /**
      * Set how much the page will be scrolled.
      * @public
-     * @param {Number} amount - The distance of the scroll
+     * @param {Number} amountX - The x distance of the scroll
+     * @param {Number} amountY - The y distance of the scroll
      * @return {Object} The youScroll object
      */
-    youScroll.by = function(amount) {
+    youScroll.by = function(amountX, amountY) {
+        // If only one parameter is passed, consider it a vertical scroll
+        if (typeof amountY === "undefined") {
+            amountY = amountX;
+            amountX = 0;
+        }
+        startX = focus ? focus.scrollLeft : root.pageXOffset;
+        deltaX = amountX;
         startY = focus ? focus.scrollTop : root.pageYOffset;
-        deltaY = amount;
+        deltaY = amountY;
         return youScroll;
     };
     /**
@@ -231,6 +285,15 @@
      */
     function elementYOffset(element) {
         return Math.round(element.getBoundingClientRect().top);
+    }
+    /**
+     * Get the X offset of an element relative to the window current scroll position.
+     * @private
+     * @param  {Node} element
+     * @return {Number} The element's X coordinate
+     */
+    function elementXOffset(element) {
+        return Math.round(element.getBoundingClientRect().left);
     }
     /**
      * Contains the scroll withing the container limits.
