@@ -309,11 +309,17 @@
      * @private
      */
     function containScroll() {
+        var targetX = startX + deltaX;
         var targetY = startY + deltaY;
         if (targetY < 0) deltaY += -targetY; else {
-            var containerVisibleHeight = focus ? focus.offsetHeight : root.innerHeight;
+            var containerVisibleHeight = focus ? focus.clientHeight : root.innerHeight;
             var containerRealHeight = focus ? focus.scrollHeight : document.body.scrollHeight;
             if (targetY + containerVisibleHeight > containerRealHeight) deltaY -= targetY + containerVisibleHeight - containerRealHeight;
+        }
+        if (targetX < 0) deltaX += -targetX; else {
+            var containerVisibleWidth = focus ? focus.clientWidth : root.innerWidth;
+            var containerRealWidth = focus ? focus.scrollWidth : document.body.scrollWidth;
+            if (targetX + containerVisibleWidth > containerRealWidth) deltaX -= targetX + containerVisibleWidth - containerRealWidth;
         }
     }
     // Easing functions
