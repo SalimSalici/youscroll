@@ -250,6 +250,15 @@
         return youScroll;
     };
     /**
+     * Set default configuration for all future scrolls.
+     * @public
+     * @param {Object} configs
+     */
+    youScroll.config = function(configs) {
+        if (typeof configs !== "object") return;
+        for (var key in configs) defaultConfigs[key] = configs[key];
+    };
+    /**
      * Check if it is possible to start a new youScroll instance in an element.
      * @public
      * @param {Node} element
