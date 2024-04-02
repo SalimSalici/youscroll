@@ -145,7 +145,7 @@
         <span style="font-weight: lighter">YouScroll.js</span> Demo
     </h1>
     
-    <div id="first" class="panel" onclick="testPromess()">
+    <div id="first" class="panel" onclick="youScroll.to('#second').start()">
         <div class="panelTitle">#first</div>
         <div>
             <div class="panelText">Scroll to #second</div>
@@ -190,15 +190,32 @@
         </div>
     </div>
 
-    <div id="third" class="panel" onclick="youScroll.to('#fifth').start()">
+    <div id="third" class="panel" onclick="chainScrollPromess()">
         <div class="panelTitle">#third</div>
         <div>
-            <div class="panelText">Scroll to #fifth</div>
+            <div class="panelText">Chained scroll to #second -> #third -> #fourth -> #fifth</div>
             <div class="panelCode">
+
+                <code>
+                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>chainScrollPromess()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span>
+                </code>
                 
                 <code>
-                    <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to("#fifth").start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
-                    </span>
+                    <pre style="font-family:monospace;color: rgb(38, 38, 38); font-weight: 400; ">
+<span style="color: rgb(38, 38, 38); font-weight: 700;">function</span> <span style="color: rgb(136, 0, 0); font-weight: 700;">chainScrollPromess</span>(<span style="color: rgb(38, 38, 38); font-weight: 400;"></span>) {
+    youScroll.<span style="color: rgb(136, 0, 0); font-weight: 700;">to</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'#second'</span>).<span style="color: rgb(136, 0, 0); font-weight: 700;">start</span>().<span style="color: rgb(38, 38, 38); font-weight: 400;">and</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">then</span>(<span style="color: rgb(38, 38, 38); font-weight: 700;">function</span> (<span style="color: rgb(38, 38, 38); font-weight: 400;"></span>) {
+        <span style="color: rgb(38, 38, 38); font-weight: 700;">return</span> youScroll.<span style="color: rgb(136, 0, 0); font-weight: 700;">to</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'#third'</span>).<span style="color: rgb(136, 0, 0); font-weight: 700;">start</span>().<span style="color: rgb(38, 38, 38); font-weight: 400;">and</span>;
+    }).<span style="color: rgb(136, 0, 0); font-weight: 700;">then</span>(<span style="color: rgb(38, 38, 38); font-weight: 700;">function</span> (<span style="color: rgb(38, 38, 38); font-weight: 400;"></span>) {
+        <span style="color: rgb(38, 38, 38); font-weight: 700;">return</span> youScroll.<span style="color: rgb(136, 0, 0); font-weight: 700;">to</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'#fourth'</span>).<span style="color: rgb(136, 0, 0); font-weight: 700;">start</span>().<span style="color: rgb(38, 38, 38); font-weight: 400;">and</span>;
+    }).<span style="color: rgb(136, 0, 0); font-weight: 700;">then</span>(<span style="color: rgb(38, 38, 38); font-weight: 700;">function</span> (<span style="color: rgb(38, 38, 38); font-weight: 400;"></span>) {
+        youScroll.<span style="color: rgb(136, 0, 0); font-weight: 700;">to</span>(<span style="color: rgb(136, 0, 0); font-weight: 400;">'#fifth'</span>).<span style="color: rgb(136, 0, 0); font-weight: 700;">start</span>();
+    }).<span style="color: rgb(136, 0, 0); font-weight: 700;">catch</span>(<span style="color: rgb(38, 38, 38); font-weight: 700;">function</span> (<span style="color: rgb(38, 38, 38); font-weight: 400;">msg</span>) {
+        <span style="color: rgb(171, 86, 86); font-weight: 400;">console</span>.<span style="color: rgb(136, 0, 0); font-weight: 700;">error</span>(msg);
+    });
+}</pre>
+                    <!-- <span style='color:#000000;'>&lt;<span style='color:#7f0055; font-weight:bold; '>div</span> onclick=<span style='color:#2a00ff; '>"</span><span style='color:#2a00ff; '>youScroll.to("#fifth").start()</span><span style='color:#2a00ff; '>"</span>>...&lt;/<span style='color:#7f0055; font-weight:bold; '>div</span>>
+                    </span> -->
                 </code>
                 
             </div>
@@ -282,7 +299,7 @@
     var testParent = document.getElementById("testParent");
     var nestedElement = document.getElementById("nestedElement");
 
-    function testPromess() {
+    function chainScrollPromess() {
         youScroll.to('#second').start().and.then(function () {
             return youScroll.to('#third').start().and;
         }).then(function () {
